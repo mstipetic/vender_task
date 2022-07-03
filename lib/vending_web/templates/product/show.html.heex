@@ -1,0 +1,37 @@
+<h1>Show Product</h1>
+
+<ul>
+
+  <li>
+    <strong>Amountavailable:</strong>
+    <%= @product.amountAvailable %>
+  </li>
+
+  <li>
+    <strong>Cost:</strong>
+    <%= @product.cost %>
+  </li>
+
+  <li>
+    <strong>Productname:</strong>
+    <%= @product.productName %>
+  </li>
+
+  <div>
+    <%= if @current_user.role == :buyer do %>
+    <p>Purchase:</p>
+    <form method="post" action={Routes.product_path(@conn, :purchase)}>
+      <%= csrf_input_tag(Routes.product_path(@conn, :purchase)) %>
+      <input type="hidden" name="productId" value={@product.id}>
+      <input name="amount" value="5" type="number" min="0" step="1">
+      <button type="submit">Purchase</button>
+    </form>
+    <% end %>
+  </div>
+
+</ul>
+
+<%= if @product.sellerId == @current_user.id do %>
+<span><%= link "Edit", to: Routes.product_path(@conn, :edit, @product) %></span> |
+<% end %>
+<span><%= link "Back", to: Routes.product_path(@conn, :index) %></span>
