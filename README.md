@@ -83,6 +83,7 @@ When logging through an API a JWT Bearer token is generated which encodes the `u
 ## Possible improvements
 
 * Better feedback on faulty imputs - currently the request fails in an opaque way, better feedback should be provided
+* Better feedback on business logic fails - currently the request fails in an opaque way, better feedback should be provided
 * Use of DB transactions - due to time constraints some important operations (purchases, for example) which touch multiple DB entities do not use DB transactions
 * Better logging
 
