@@ -6,8 +6,8 @@ defmodule VendingWeb.Api.UserController do
 
   action_fallback VendingWeb.FallbackController
 
-  plug :require_authenticated_user when action in [:index, :show, :delete, :identify, :balance, :deposit, :reset]
-  plug :only_on_self when action in [:show, :delete]
+  plug :require_authenticated_user when action in [:index, :show, :delete, :identify, :balance, :deposit, :reset, :change_password]
+  plug :only_on_self when action in [:show, :delete, :change_password]
   plug :require_buyer when action in [:balance, :deposit, :reset]
 
   def index(conn, _params) do
@@ -49,6 +49,15 @@ defmodule VendingWeb.Api.UserController do
 
   end
 
+  def change_password(conn, %{"currentPassword" => current_password, "password" => _password} = password_data) do
+    id = Map.get(conn.assigns, :current_user)
+    user = Accounts.get_user!(id)
+    with {:ok, %User{} = user} <- Accounts.update_user_password(user, current_password, password_data) do
+      conn
+      |> render("show.json", user: user)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
     with {:ok, %User{}} <- Accounts.delete_user(user) do
@@ -60,18 +69,20 @@ defmodule VendingWeb.Api.UserController do
     id = Map.get(conn.assigns, :current_user)
     user = Accounts.get_user!(id)
     conn
-    |> put_status(:created)
     |> render("balance.json", %{user: user})
   end
 
-  def deposit(conn, %{"amount" => amount}) do
+  def deposit(conn, %{"amount" => amount}) when amount in [5, 10, 20, 50, 100] do
     id = Map.get(conn.assigns, :current_user)
     user = Accounts.get_user!(id)
     user = Accounts.add_user_balance(user, amount)
     conn
-    |> put_status(:created)
     |> render("balance.json", %{user: user})
 
+  end
+
+  def deposit(_conn, _params) do
+    {:error, :invalid_amount}
   end
 
   def reset(conn, _params) do
@@ -79,7 +90,6 @@ defmodule VendingWeb.Api.UserController do
     user = Accounts.get_user!(id)
     user = Accounts.reset_user_balance(user)
     conn
-    |> put_status(:created)
     |> render("balance.json", %{user: user})
   end
 

@@ -14,7 +14,9 @@ defmodule Vending.Purchases do
     if (user.deposit >= total_price) and (product.amountAvailable >= amount) do
       from(u in User, where: u.id == ^user.id, update: [set: [deposit: u.deposit - ^total_price]]) |> Repo.update_all([])
       from(p in Product, where: p.id == ^product_id, update: [set: [amountAvailable: p.amountAvailable - ^amount]]) |> Repo.update_all([])
-      {:ok, %{amount: amount, product_id: product.id}}
+      Accounts.reset_user_balance(user)
+      returns = Vending.Utils.calculate_return(user.deposit - total_price)
+      {:ok, %{amount: amount, product_id: product.id, returns: returns}}
     else
       {:error, :not_possible}
     end

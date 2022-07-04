@@ -15,7 +15,8 @@ defmodule VendingWeb.Api.ProductView do
       id: product.id,
       amountAvailable: product.amountAvailable,
       cost: product.cost,
-      productName: product.productName
+      productName: product.productName,
+      sellerId: product.sellerId,
     }
   end
 end

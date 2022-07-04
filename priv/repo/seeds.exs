@@ -13,8 +13,10 @@
 alias Vending.Accounts.User
 alias Vending.Products.Product
 
-{:ok, seller_1} = Vending.Accounts.register_user(%{email: "hello2@email.com", password: "Password123!", role: "seller"})
-{:ok, buyer_1} = Vending.Accounts.register_user(%{email: "hello@email.com", password: "Password123!", role: "buyer"})
+{:ok, seller_1} = Vending.Accounts.register_user(%{email: "seller1@email.com", password: "Password123!", role: "seller"})
+{:ok, seller_2} = Vending.Accounts.register_user(%{email: "seller2@email.com", password: "Password123!", role: "seller"})
+{:ok, buyer_1} = Vending.Accounts.register_user(%{email: "buyer1@email.com", password: "Password123!", role: "buyer"})
+{:ok, buyer_2} = Vending.Accounts.register_user(%{email: "buyer2@email.com", password: "Password123!", role: "buyer"})
 
 Vending.Products.create_product(%{
   amountAvailable: 300,
@@ -41,5 +43,19 @@ Vending.Products.create_product(%{
   amountAvailable: 100,
   cost: 50,
   productName: "Product 4",
-  sellerId: seller_1.id,
+  sellerId: seller_2.id,
+})
+
+Vending.Products.create_product(%{
+  amountAvailable: 100,
+  cost: 50,
+  productName: "Product 5",
+  sellerId: seller_2.id,
+})
+
+Vending.Products.create_product(%{
+  amountAvailable: 100,
+  cost: 50,
+  productName: "Product 6",
+  sellerId: seller_2.id,
 })

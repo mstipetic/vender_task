@@ -15,7 +15,7 @@ defmodule VendingWeb.Api.UserView do
   end
 
   def render("balance.json", %{user: user}) do
-    %{data: %{balance: user.deposit}}
+    %{data: %{deposit: user.deposit}}
   end
 
   def render("user.json", %{user: user}) do

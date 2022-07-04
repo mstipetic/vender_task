@@ -34,6 +34,7 @@ defmodule VendingWeb.Router do
     get "/users/me", UserController, :identify
     get "/users/:id", UserController, :show
     post "/users", UserController, :create
+    post "/users/:id/change_password", UserController, :change_password
     delete "/users/:id", UserController, :delete
 
     post "/login", UserController, :login
@@ -83,6 +84,7 @@ defmodule VendingWeb.Router do
     resources "/products", ProductController
 
     post "/purchase", ProductController, :purchase
+    post "/deposit", UserSettingsController, :deposit
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update

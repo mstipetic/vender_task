@@ -64,6 +64,21 @@ defmodule VendingWeb.UserSettingsController do
     end
   end
 
+  def deposit(conn, %{"amount" => amount}) when amount in ["5", "10", "20", "50", "100"] do
+    amount = String.to_integer(amount)
+    user = Map.get(conn.assigns, :current_user)
+    _user = Accounts.add_user_balance(user, amount)
+    conn
+    |> put_flash(:info, "Succesfully deposited #{amount}")
+    |> redirect(to: "/")
+  end
+
+  def deposit(conn, params) do
+    conn
+    |> put_flash(:error, "Invalid deposit amount")
+    |> redirect(to: "/")
+  end
+
   defp assign_email_and_password_changesets(conn, _opts) do
     user = conn.assigns.current_user
 

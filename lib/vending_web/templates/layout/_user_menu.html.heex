@@ -6,7 +6,6 @@
   <li><%= link "Settings", to: Routes.user_settings_path(@conn, :edit) %></li>
   <li><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></li>
   <%= if @has_other_sessions do %>
-    has other sessions <%= @has_other_sessions %>
     <%= link "Log others out", to: Routes.user_session_path(@conn, :delete_other) %>
   <% end %>
   <% else %>

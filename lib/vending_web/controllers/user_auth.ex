@@ -47,7 +47,6 @@ defmodule VendingWeb.UserAuth do
 
   def check_for_other_active_sessions(conn, user, true = _flash) do
     number_of_active_sessions = Accounts.get_number_of_active_user_sessions(user)
-    IO.puts("Number of active sessions: #{number_of_active_sessions}")
     if number_of_active_sessions > 1 do
       conn
       |> put_flash(:info, "There are other logged in sessions")
@@ -62,7 +61,6 @@ defmodule VendingWeb.UserAuth do
     user = Map.get(conn.assigns, :current_user, nil)
     if user do
       number_of_active_sessions = Accounts.get_number_of_active_user_sessions(user)
-      IO.puts("Number of active sessions: #{number_of_active_sessions}")
       if number_of_active_sessions > 1 do
         conn
         |> assign(:has_other_sessions, true)
@@ -179,8 +177,8 @@ defmodule VendingWeb.UserAuth do
     end
   end
 
-  def require_buyer(conn, _opts) do
-    if conn.assigns[:current_user] and conn.assigns[:current_user].role == :buyer do
+  def require_buyer_web(conn, _opts) do
+    if conn.assigns[:current_user] != nil and conn.assigns[:current_user].role == :buyer do
       conn
     else
       conn
@@ -191,14 +189,29 @@ defmodule VendingWeb.UserAuth do
     end
   end
 
-  def require_seller(conn, _opts) do
-    if conn.assigns[:current_user] and conn.assigns[:current_user].role == :seller do
+  def require_seller_web(conn, _opts) do
+    if conn.assigns[:current_user] != nil and conn.assigns[:current_user].role == :seller do
       conn
     else
       conn
       |> put_flash(:error, "You must be a seller to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
+      |> halt()
+    end
+  end
+
+  def require_product_ownership_web(conn, _opts) do
+    {param_product_id, _} = Integer.parse(Map.get(conn.params, "id"))
+    current_user = Map.get(conn.assigns, :current_user)
+
+    product = Vending.Products.get_product!(param_product_id)
+    if current_user.id == product.sellerId do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You can only interact with your products.")
+      |> redirect(to: Routes.product_path(conn, :index))
       |> halt()
     end
   end

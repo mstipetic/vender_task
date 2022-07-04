@@ -20,8 +20,6 @@ defmodule VendingWeb.UserSessionController do
   end
 
   def delete_other(conn, _params) do
-    IO.inspect(conn, label: :other)
-
     UserAuth.log_out_other_tokens(conn)
     
     conn

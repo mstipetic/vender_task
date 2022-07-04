@@ -23,7 +23,8 @@ defmodule VendingWeb do
 
       import Plug.Conn
       import VendingWeb.Gettext
-      import VendingWeb.Api.Auth, only: [require_authenticated_user: 2, only_on_self: 2, require_seller: 2, require_buyer: 2]
+      import VendingWeb.Api.Auth, only: [require_authenticated_user: 2, only_on_self: 2, require_seller: 2, require_buyer: 2, only_on_own_product: 2]
+      import VendingWeb.UserAuth, only: [require_buyer_web: 2, require_seller_web: 2, require_product_ownership_web: 2]
       alias VendingWeb.Router.Helpers, as: Routes
     end
   end

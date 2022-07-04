@@ -7,12 +7,12 @@ defmodule VendingWeb.Api.ProductControllerTest do
 
   @create_attrs %{
     amountAvailable: 42,
-    cost: 42,
+    cost: 50,
     productName: "some productName"
   }
   @update_attrs %{
     amountAvailable: 43,
-    cost: 43,
+    cost: 60,
     productName: "some updated productName"
   }
   @invalid_attrs %{amountAvailable: nil, cost: nil, productName: nil}
@@ -22,14 +22,18 @@ defmodule VendingWeb.Api.ProductControllerTest do
   end
 
   describe "index" do
-    test "lists all products", %{conn: conn} do
+    setup [:create_product]
+    test "lists all products", %{conn: conn, user: user} do
+      conn = conn |> log_in_api_user(user)
       conn = get(conn, Routes.api_product_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
+      assert length(json_response(conn, 200)["data"]) == 1
     end
   end
 
   describe "create product" do
-    test "renders product when data is valid", %{conn: conn} do
+    setup [:create_product]
+    test "renders product when data is valid", %{conn: conn, user: user} do
+      conn = conn |> log_in_api_user(user)
       conn = post(conn, Routes.api_product_path(conn, :create), product: @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
@@ -38,12 +42,13 @@ defmodule VendingWeb.Api.ProductControllerTest do
       assert %{
                "id" => ^id,
                "amountAvailable" => 42,
-               "cost" => 42,
+               "cost" => 50,
                "productName" => "some productName"
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
+    test "renders errors when data is invalid", %{conn: conn, user: user} do
+      conn = conn |> log_in_api_user(user)
       conn = post(conn, Routes.api_product_path(conn, :create), product: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
@@ -52,7 +57,8 @@ defmodule VendingWeb.Api.ProductControllerTest do
   describe "update product" do
     setup [:create_product]
 
-    test "renders product when data is valid", %{conn: conn, product: %Product{id: id} = product} do
+    test "renders product when data is valid", %{conn: conn, user: user, product: %Product{id: id} = product} do
+      conn = conn |> log_in_api_user(user)
       conn = put(conn, Routes.api_product_path(conn, :update, product), product: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
@@ -61,12 +67,13 @@ defmodule VendingWeb.Api.ProductControllerTest do
       assert %{
                "id" => ^id,
                "amountAvailable" => 43,
-               "cost" => 43,
+               "cost" => 60,
                "productName" => "some updated productName"
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn, product: product} do
+    test "renders errors when data is invalid", %{conn: conn, user: user, product: product} do
+      conn = conn |> log_in_api_user(user)
       conn = put(conn, Routes.api_product_path(conn, :update, product), product: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
@@ -75,7 +82,8 @@ defmodule VendingWeb.Api.ProductControllerTest do
   describe "delete product" do
     setup [:create_product]
 
-    test "deletes chosen product", %{conn: conn, product: product} do
+    test "deletes chosen product", %{conn: conn, user: user, product: product} do
+      conn = conn |> log_in_api_user(user)
       conn = delete(conn, Routes.api_product_path(conn, :delete, product))
       assert response(conn, 204)
 
@@ -86,7 +94,6 @@ defmodule VendingWeb.Api.ProductControllerTest do
   end
 
   defp create_product(_) do
-    product = product_fixture()
-    %{product: product}
+    product_fixture()
   end
 end

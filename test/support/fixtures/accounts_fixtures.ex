@@ -5,7 +5,7 @@ defmodule Vending.AccountsFixtures do
   """
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def valid_user_password, do: "hello world!"
+  def valid_user_password, do: "Password123!"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
@@ -14,10 +14,27 @@ defmodule Vending.AccountsFixtures do
     })
   end
 
+  def valid_user_seller_attributes(attrs \\ %{}) do
+    Enum.into(attrs, %{
+      email: unique_user_email(),
+      password: valid_user_password(),
+      role: :seller,
+    })
+  end
+
   def user_fixture(attrs \\ %{}) do
     {:ok, user} =
       attrs
       |> valid_user_attributes()
+      |> Vending.Accounts.register_user()
+
+    user
+  end
+
+  def user_seller_fixture(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> valid_user_seller_attributes()
       |> Vending.Accounts.register_user()
 
     user

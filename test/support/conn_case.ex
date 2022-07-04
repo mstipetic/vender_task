@@ -49,6 +49,11 @@ defmodule VendingWeb.ConnCase do
     %{conn: log_in_user(conn, user), user: user}
   end
 
+  def register_and_log_in_seller_user(%{conn: conn}) do
+    user = Vending.AccountsFixtures.user_seller_fixture()
+    %{conn: log_in_user(conn, user), user: user}
+  end
+
   @doc """
   Logs the given `user` into the `conn`.
 
@@ -60,5 +65,14 @@ defmodule VendingWeb.ConnCase do
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
     |> Plug.Conn.put_session(:user_token, token)
+  end
+
+  def log_in_api_user(conn, user) do
+    token = Phoenix.Token.sign(VendingWeb.Endpoint, "token salt", user.id, max_age: 86400)
+    bearer_token = "Bearer #{token}"
+
+    conn
+    |> Phoenix.ConnTest.init_test_session(%{})
+    |> Plug.Conn.put_req_header("authorization", bearer_token)
   end
 end

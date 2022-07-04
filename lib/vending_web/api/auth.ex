@@ -53,9 +53,27 @@ defmodule VendingWeb.Api.Auth do
     end
   end
 
+  def only_on_own_product(conn, _opts) do
+    {param_product_id, _} = Integer.parse(Map.get(conn.params, "id"))
+    current_user_id = Map.get(conn.assigns, :current_user)
+
+    IO.puts("#{current_user_id} tried #{param_product_id}")
+
+    product = Vending.Products.get_product!(param_product_id)
+    if product.sellerId == current_user_id do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> put_view(VendingWeb.ErrorView)
+      |> render(:"401")
+      # Stop any downstream transformations.
+      |> halt()
+    end
+  end
+
   def require_buyer(conn, _opts) do
     current_user_role = Map.get(conn.assigns, :current_role)
-    IO.inspect(current_user_role, label: :cur)
     if current_user_role == :buyer do
       conn
     else
@@ -70,6 +88,7 @@ defmodule VendingWeb.Api.Auth do
 
   def require_seller(conn, _opts) do
     current_user_role = Map.get(conn.assigns, :current_role)
+    IO.puts("current user role #{current_user_role}")
     if current_user_role == :seller do
       conn
     else

@@ -63,7 +63,7 @@ defmodule Vending.AccountsTest do
 
       assert %{
                email: ["must have the @ sign and no spaces"],
-               password: ["should be at least 12 character(s)"]
+               password: ["at least one digit or punctuation character", "at least one upper case character"],
              } = errors_on(changeset)
     end
 
@@ -245,11 +245,11 @@ defmodule Vending.AccountsTest do
     test "allows fields to be set" do
       changeset =
         Accounts.change_user_password(%User{}, %{
-          "password" => "new valid password"
+          "password" => "Password111!!"
         })
 
       assert changeset.valid?
-      assert get_change(changeset, :password) == "new valid password"
+      assert get_change(changeset, :password) == "Password111!!"
       assert is_nil(get_change(changeset, :hashed_password))
     end
   end
@@ -267,7 +267,7 @@ defmodule Vending.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
+               password: ["at least one digit or punctuation character", "at least one upper case character"],
                password_confirmation: ["does not match password"]
              } = errors_on(changeset)
     end
@@ -291,11 +291,11 @@ defmodule Vending.AccountsTest do
     test "updates the password", %{user: user} do
       {:ok, user} =
         Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
+          password: "Password111!!"
         })
 
       assert is_nil(user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_email_and_password(user.email, "Password111!!")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
@@ -303,7 +303,7 @@ defmodule Vending.AccountsTest do
 
       {:ok, _} =
         Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
+          password: "Password111!!"
         })
 
       refute Repo.get_by(UserToken, user_id: user.id)
@@ -476,8 +476,8 @@ defmodule Vending.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
+               password: ["at least one digit or punctuation character", "at least one upper case character"],
+               password_confirmation: ["does not match password"],
              } = errors_on(changeset)
     end
 
@@ -488,14 +488,14 @@ defmodule Vending.AccountsTest do
     end
 
     test "updates the password", %{user: user} do
-      {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "new valid password"})
+      {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "Password111!"})
       assert is_nil(updated_user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_email_and_password(user.email, "Password111!")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
       _ = Accounts.generate_user_session_token(user)
-      {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"})
+      {:ok, _} = Accounts.reset_user_password(user, %{password: "Password111!"})
       refute Repo.get_by(UserToken, user_id: user.id)
     end
   end

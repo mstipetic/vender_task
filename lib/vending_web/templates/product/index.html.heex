@@ -1,3 +1,12 @@
+<%= if @current_user.role == :buyer do %>
+<h1>Deposit credits:</h1>
+<form method="post" action={Routes.user_settings_path(@conn, :deposit)}>
+  <%= csrf_input_tag(Routes.user_settings_path(@conn, :deposit)) %>
+  <input name="amount" value="5" type="number" min="5" step="5">
+  <button type="submit">Deposit</button>
+</form>
+<% end %>
+
 <h1>Listing Products</h1>
 
 <table>

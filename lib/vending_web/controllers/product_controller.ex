@@ -4,6 +4,11 @@ defmodule VendingWeb.ProductController do
   alias Vending.Products
   alias Vending.Products.Product
 
+  plug :require_seller_web when action in [:new, :create, :edit, :update, :delete]
+  plug :require_product_ownership_web when action in [:edit, :update, :delete]
+
+  plug :require_buyer_web when action in [:purchase]
+
   def index(conn, _params) do
     products = Products.list_products()
     render(conn, "index.html", products: products)
@@ -15,6 +20,8 @@ defmodule VendingWeb.ProductController do
   end
 
   def create(conn, %{"product" => product_params}) do
+    user = Map.get(conn.assigns, :current_user, nil)
+    product_params = Map.put(product_params, "sellerId", user.id)
     case Products.create_product(product_params) do
       {:ok, product} ->
         conn
