@@ -64,17 +64,16 @@ defmodule VendingWeb.ProductController do
     product = Products.get_product!(product_id)
 
     case Vending.Purchases.make_purchase(current_user.id, product_id, amount) do
-      {:ok, _purchase} ->
+      {:ok, purchase} ->
+        IO.inspect(purchase, label: :new_purchase)
         conn
-        |> put_flash(:info, "Product purchased successfully.")
+        |> put_flash(:info, "Product purchased successfully. Return: #{Enum.join(purchase.returns, ", ")}")
         |> redirect(to: Routes.product_path(conn, :show, product))
       {:error, _reason} ->
         conn
         |> put_flash(:error, "Unable to make purchase.")
         |> redirect(to: Routes.product_path(conn, :show, product))
     end
-
-    conn
   end
 
   def delete(conn, %{"id" => id}) do
